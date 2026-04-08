@@ -110,7 +110,7 @@ export default function Dashboard() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => useAuth.getState().signOut()}
+              onClick={() => useAuthStore.getState().signOut()}
             >
               <LogOut className="h-4 w-4" />
             </Button>

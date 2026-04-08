@@ -11,7 +11,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
-import TextStyle from '@tiptap/extension-text-style';
+import { TextStyle } from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
 import LinkExt from '@tiptap/extension-link';
 import Highlight from '@tiptap/extension-highlight';
@@ -99,7 +99,7 @@ export default function DocumentEditor() {
       .on('broadcast', { event: 'content-change' }, ({ payload }) => {
         if (payload.userId !== user.id && editor) {
           const cursorPos = editor.state.selection.from;
-          editor.commands.setContent(payload.content, false);
+          editor.commands.setContent(payload.content, false, { preserveWhitespace: 'full' });
           // Try to restore cursor
           try {
             editor.commands.setTextSelection(Math.min(cursorPos, editor.state.doc.content.size));
