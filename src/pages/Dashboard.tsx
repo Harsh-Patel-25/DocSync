@@ -236,6 +236,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
-// Fix: signOut via store
-import { useAuthStore } from '@/store/authStore';
