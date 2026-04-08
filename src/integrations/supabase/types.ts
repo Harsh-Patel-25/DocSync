@@ -14,16 +14,237 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      comments: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          document_id: string
+          id: string
+          parent_id: string | null
+          resolved: boolean
+          text_range: Json | null
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          document_id: string
+          id?: string
+          parent_id?: string | null
+          resolved?: boolean
+          text_range?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          document_id?: string
+          id?: string
+          parent_id?: string | null
+          resolved?: boolean
+          text_range?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_permissions: {
+        Row: {
+          created_at: string
+          document_id: string
+          id: string
+          role: Database["public"]["Enums"]["document_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          id?: string
+          role?: Database["public"]["Enums"]["document_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          id?: string
+          role?: Database["public"]["Enums"]["document_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_permissions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_versions: {
+        Row: {
+          content_snapshot: Json
+          created_at: string
+          created_by: string | null
+          document_id: string
+          id: string
+        }
+        Insert: {
+          content_snapshot: Json
+          created_at?: string
+          created_by?: string | null
+          document_id: string
+          id?: string
+        }
+        Update: {
+          content_snapshot?: Json
+          created_at?: string
+          created_by?: string | null
+          document_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          content: Json | null
+          created_at: string
+          id: string
+          is_deleted: boolean
+          owner_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          owner_id: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          owner_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          document_id: string | null
+          id: string
+          is_read: boolean
+          message: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_id?: string | null
+          id?: string
+          is_read?: boolean
+          message: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_id?: string | null
+          id?: string
+          is_read?: boolean
+          message?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_document_access: {
+        Args: { doc_id: string; uid: string }
+        Returns: boolean
+      }
+      has_document_role: {
+        Args: {
+          doc_id: string
+          min_role: Database["public"]["Enums"]["document_role"]
+          uid: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      document_role: "owner" | "editor" | "commenter" | "viewer"
+      notification_type: "comment_mention" | "access_granted" | "comment_reply"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +371,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      document_role: ["owner", "editor", "commenter", "viewer"],
+      notification_type: ["comment_mention", "access_granted", "comment_reply"],
+    },
   },
 } as const
