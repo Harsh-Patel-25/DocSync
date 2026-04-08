@@ -99,7 +99,7 @@ export default function DocumentEditor() {
       .on('broadcast', { event: 'content-change' }, ({ payload }) => {
         if (payload.userId !== user.id && editor) {
           const cursorPos = editor.state.selection.from;
-          editor.commands.setContent(payload.content, false, { preserveWhitespace: 'full' });
+          editor.commands.setContent(payload.content);
           // Try to restore cursor
           try {
             editor.commands.setTextSelection(Math.min(cursorPos, editor.state.doc.content.size));
