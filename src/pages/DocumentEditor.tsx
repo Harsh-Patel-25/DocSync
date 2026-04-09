@@ -23,6 +23,7 @@ import { ConnectionStatus } from '@/components/editor/ConnectionStatus';
 import {
   ArrowLeft, MessageSquare, History, Share2, Loader2,
 } from 'lucide-react';
+import { NotificationsDropdown } from '@/components/NotificationsDropdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -270,6 +271,7 @@ export default function DocumentEditor() {
 
           <div className="ml-auto flex items-center gap-2">
             <PresenceBar />
+            <NotificationsDropdown />
             
             <Button
               variant="ghost"

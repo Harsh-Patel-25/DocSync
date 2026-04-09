@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import {
   FileText, Plus, Search, LogOut, Trash2, Loader2, Clock, Users,
 } from 'lucide-react';
+import { NotificationsDropdown } from '@/components/NotificationsDropdown';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -108,6 +109,7 @@ export default function Dashboard() {
             <span className="hidden text-sm text-muted-foreground sm:block">
               {profile?.display_name || user?.email}
             </span>
+            <NotificationsDropdown />
             <Button
               variant="ghost"
               size="icon"
