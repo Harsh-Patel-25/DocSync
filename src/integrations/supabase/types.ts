@@ -135,6 +135,7 @@ export type Database = {
           created_at: string
           id: string
           is_deleted: boolean
+          is_starred: boolean
           owner_id: string
           title: string
           updated_at: string
@@ -144,6 +145,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_deleted?: boolean
+          is_starred?: boolean
           owner_id: string
           title?: string
           updated_at?: string
@@ -153,6 +155,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_deleted?: boolean
+          is_starred?: boolean
           owner_id?: string
           title?: string
           updated_at?: string
