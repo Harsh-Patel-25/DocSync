@@ -2,15 +2,30 @@ import type { Editor } from '@tiptap/react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   AlignLeft, AlignCenter, AlignRight,
   List, ListOrdered, Quote, Code, Heading1, Heading2, Heading3,
-  Undo, Redo, Link, Highlighter,
+  Undo, Redo, Link, Highlighter, Table, Image, Minus,
 } from 'lucide-react';
 
 interface EditorToolbarProps {
   editor: Editor;
 }
+
+const FONT_FAMILIES = [
+  { label: 'Default', value: '' },
+  { label: 'Arial', value: 'Arial, sans-serif' },
+  { label: 'Georgia', value: 'Georgia, serif' },
+  { label: 'Times New Roman', value: 'Times New Roman, serif' },
+  { label: 'Courier New', value: 'Courier New, monospace' },
+  { label: 'Verdana', value: 'Verdana, sans-serif' },
+  { label: 'Comic Sans MS', value: 'Comic Sans MS, cursive' },
+];
+
+const FONT_SIZES = ['12', '14', '16', '18', '20', '24', '28', '32', '36', '48', '64'];
 
 export function EditorToolbar({ editor }: EditorToolbarProps) {
   const ToolButton = ({
@@ -36,6 +51,27 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
     </Button>
   );
 
+  const handleFontFamily = (value: string) => {
+    if (value === '') {
+      editor.chain().focus().unsetFontFamily().run();
+    } else {
+      editor.chain().focus().setFontFamily(value).run();
+    }
+  };
+
+  const handleFontSize = (size: string) => {
+    editor.chain().focus().setMark('textStyle', { fontSize: `${size}px` }).run();
+  };
+
+  const insertImage = () => {
+    const url = window.prompt('Enter image URL:');
+    if (url) editor.chain().focus().setImage({ src: url }).run();
+  };
+
+  const insertTable = () => {
+    editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+  };
+
   return (
     <div className="flex flex-wrap items-center gap-0.5 border-t border-toolbar-border bg-toolbar px-4 py-1">
       <ToolButton onClick={() => editor.chain().focus().undo().run()} title="Undo">
@@ -44,6 +80,34 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <ToolButton onClick={() => editor.chain().focus().redo().run()} title="Redo">
         <Redo className="h-4 w-4" />
       </ToolButton>
+
+      <Separator orientation="vertical" className="mx-1 h-6" />
+
+      {/* Font Family */}
+      <Select onValueChange={handleFontFamily}>
+        <SelectTrigger className="h-8 w-[120px] text-xs border-none bg-transparent">
+          <SelectValue placeholder="Font" />
+        </SelectTrigger>
+        <SelectContent>
+          {FONT_FAMILIES.map(f => (
+            <SelectItem key={f.value} value={f.value || 'default'} className="text-xs">
+              <span style={{ fontFamily: f.value || 'inherit' }}>{f.label}</span>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {/* Font Size */}
+      <Select onValueChange={handleFontSize}>
+        <SelectTrigger className="h-8 w-[70px] text-xs border-none bg-transparent">
+          <SelectValue placeholder="Size" />
+        </SelectTrigger>
+        <SelectContent>
+          {FONT_SIZES.map(s => (
+            <SelectItem key={s} value={s} className="text-xs">{s}px</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       <Separator orientation="vertical" className="mx-1 h-6" />
 
@@ -173,6 +237,15 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         title="Link"
       >
         <Link className="h-4 w-4" />
+      </ToolButton>
+      <ToolButton onClick={insertImage} title="Insert Image">
+        <Image className="h-4 w-4" />
+      </ToolButton>
+      <ToolButton onClick={insertTable} active={editor.isActive('table')} title="Insert Table">
+        <Table className="h-4 w-4" />
+      </ToolButton>
+      <ToolButton onClick={() => editor.chain().focus().setHorizontalRule().run()} title="Horizontal Rule">
+        <Minus className="h-4 w-4" />
       </ToolButton>
     </div>
   );
