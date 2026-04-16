@@ -53,11 +53,11 @@ export function ShareDialog({
       const userIds = data.map(p => p.user_id);
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('user_id, display_name')
+        .select('user_id, display_name, email')
         .in('user_id', userIds);
 
-      const nameMap = new Map(profiles?.map(p => [p.user_id, p.display_name]) || []);
-      setPermissions(data.map(p => ({ ...p, email: nameMap.get(p.user_id) || p.user_id })));
+      const emailMap = new Map(profiles?.map(p => [p.user_id, p.email || p.display_name]) || []);
+      setPermissions(data.map(p => ({ ...p, email: emailMap.get(p.user_id) || p.user_id })));
     }
   };
 
@@ -65,11 +65,11 @@ export function ShareDialog({
     if (!email.trim()) return;
     setAdding(true);
 
-    // Find user by email (through auth — we look up profiles by display_name which is set to email on signup)
+    // Find user by email
     const { data: profiles } = await supabase
       .from('profiles')
       .select('user_id')
-      .eq('display_name', email.trim());
+      .eq('email', email.trim());
 
     if (!profiles || profiles.length === 0) {
       toast({ title: 'User not found', description: 'No user with that email exists.', variant: 'destructive' });
