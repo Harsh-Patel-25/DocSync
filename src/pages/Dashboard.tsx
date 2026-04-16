@@ -127,15 +127,32 @@ export default function Dashboard() {
     }
   };
 
+  // Server-side search
+  const [searchResults, setSearchResults] = useState<Document[] | null>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+
+  useEffect(() => {
+    if (!search.trim() || !user) {
+      setSearchResults(null);
+      return;
+    }
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(async () => {
+      const { data } = await supabase.rpc('search_documents', {
+        search_query: search.trim(),
+        uid: user.id,
+      });
+      if (data) setSearchResults(data as Document[]);
+    }, 300);
+    return () => { if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current); };
+  }, [search, user]);
+
   const getFilteredDocs = () => {
+    if (searchResults !== null) return searchResults;
     let filtered = documents;
     if (tab === 'all') filtered = filtered.filter(d => !d.is_deleted);
     else if (tab === 'starred') filtered = filtered.filter(d => d.is_starred && !d.is_deleted);
     else if (tab === 'trash') filtered = filtered.filter(d => d.is_deleted);
-
-    if (search) {
-      filtered = filtered.filter(d => d.title.toLowerCase().includes(search.toLowerCase()));
-    }
     return filtered;
   };
 
