@@ -65,11 +65,11 @@ export function ShareDialog({
     if (!email.trim()) return;
     setAdding(true);
 
-    // Find user by email (through auth — we look up profiles by display_name which is set to email on signup)
+    // Find user by email
     const { data: profiles } = await supabase
       .from('profiles')
       .select('user_id')
-      .eq('display_name', email.trim());
+      .eq('email', email.trim());
 
     if (!profiles || profiles.length === 0) {
       toast({ title: 'User not found', description: 'No user with that email exists.', variant: 'destructive' });
