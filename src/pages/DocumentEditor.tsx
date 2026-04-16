@@ -71,6 +71,13 @@ export default function DocumentEditor() {
       Color,
       LinkExt.configure({ openOnClick: false }),
       Highlight.configure({ multicolor: true }),
+      TableExt.configure({ resizable: true }),
+      TableRow,
+      TableCell,
+      TableHeader,
+      ImageExt.configure({ inline: false, allowBase64: true }),
+      FontFamily,
+      FontSize,
     ],
     editable: canEdit,
     onUpdate: ({ editor }) => {
