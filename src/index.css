@@ -205,6 +205,37 @@
   @apply bg-warning/20 border-b-2 border-warning/40 cursor-pointer;
 }
 
+/* Table styles */
+.tiptap table {
+  @apply w-full border-collapse my-4;
+}
+
+.tiptap table td,
+.tiptap table th {
+  @apply border border-border p-2 min-w-[80px] relative;
+}
+
+.tiptap table th {
+  @apply bg-muted font-semibold text-left;
+}
+
+.tiptap table .selectedCell {
+  @apply bg-primary/10;
+}
+
+.tiptap table .column-resize-handle {
+  @apply absolute top-0 right-[-2px] bottom-0 w-1 bg-primary/50 pointer-events-none;
+}
+
+/* Image styles */
+.tiptap img {
+  @apply max-w-full h-auto rounded-lg my-4;
+}
+
+.tiptap img.ProseMirror-selectednode {
+  @apply ring-2 ring-primary;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   @apply w-2;
