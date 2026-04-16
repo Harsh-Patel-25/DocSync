@@ -247,6 +247,18 @@ export type Database = {
         }
         Returns: boolean
       }
+      search_documents: {
+        Args: { search_query: string; uid: string }
+        Returns: {
+          created_at: string
+          id: string
+          is_deleted: boolean
+          is_starred: boolean
+          owner_id: string
+          title: string
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
       document_role: "owner" | "editor" | "commenter" | "viewer"

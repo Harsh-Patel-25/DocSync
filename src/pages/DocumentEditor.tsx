@@ -15,6 +15,13 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
 import LinkExt from '@tiptap/extension-link';
 import Highlight from '@tiptap/extension-highlight';
+import { Table as TableExt } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableCell } from '@tiptap/extension-table-cell';
+import { TableHeader } from '@tiptap/extension-table-header';
+import ImageExt from '@tiptap/extension-image';
+import FontFamily from '@tiptap/extension-font-family';
+import { FontSize } from '@/lib/FontSize';
 import { CommentsPanel } from '@/components/editor/CommentsPanel';
 import { VersionHistory } from '@/components/editor/VersionHistory';
 import { ShareDialog } from '@/components/editor/ShareDialog';
@@ -64,6 +71,13 @@ export default function DocumentEditor() {
       Color,
       LinkExt.configure({ openOnClick: false }),
       Highlight.configure({ multicolor: true }),
+      TableExt.configure({ resizable: true }),
+      TableRow,
+      TableCell,
+      TableHeader,
+      ImageExt.configure({ inline: false, allowBase64: true }),
+      FontFamily,
+      FontSize,
     ],
     editable: canEdit,
     onUpdate: ({ editor }) => {
