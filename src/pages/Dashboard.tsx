@@ -73,7 +73,7 @@ export default function Dashboard() {
     // Fetch all docs including deleted ones (for trash tab)
     const { data, error } = await supabase
       .from("documents")
-      .select("id, title, owner_id, created_at, updated_at, is_starred, is_deleted")
+      .select("id, title, owner_id, created_at, updated_at, is_starred, is_deleted, content")
       .order("updated_at", { ascending: false });
 
     if (error) {
