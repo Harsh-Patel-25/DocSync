@@ -85,6 +85,24 @@ src/
 └── types/              # Global TypeScript definitions
 ```
 
+## 🚀 Deployment
+
+### Deploy to Netlify
+
+1.  **Push your code** to a GitHub/GitLab/Bitbucket repository.
+2.  **Connect to Netlify**: Log in to Netlify and click "Add new site" > "Import an existing project".
+3.  **Configure Build Settings**:
+    - **Build Command**: `npm run build`
+    - **Publish Directory**: `dist`
+4.  **Environment Variables**:
+    Go to "Site settings" > "Environment variables" and add the following:
+    - `VITE_SUPABASE_URL`: Your Supabase project URL.
+    - `VITE_SUPABASE_PUBLISHABLE_KEY`: Your Supabase anon key.
+    - `VITE_SUPABASE_PROJECT_ID`: Your Supabase project ID.
+5.  **Click "Deploy"**.
+
+*The project includes a `netlify.toml` file that automatically configures redirects for client-side routing.*
+
 ## 🤝 Contributing
 
 We welcome contributions! Please check out our [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to get started.
