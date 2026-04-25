@@ -1,40 +1,55 @@
-import { useEffect, useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
-import { useAuthStore } from '@/store/authStore';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { TemplateGallery } from '@/components/editor/TemplateGallery';
+import { useEffect, useState, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useAuthStore } from "@/store/authStore";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { TemplateGallery } from "@/components/editor/TemplateGallery";
 import {
-  FileText, Plus, Search, LogOut, Trash2, Loader2, Clock, Star, StarOff, Copy, RotateCcw, LayoutTemplate,
-} from 'lucide-react';
-import { NotificationsDropdown } from '@/components/NotificationsDropdown';
+  FileText,
+  Plus,
+  Search,
+  LogOut,
+  Trash2,
+  Loader2,
+  Clock,
+  Star,
+  StarOff,
+  Copy,
+  RotateCcw,
+  LayoutTemplate,
+} from "lucide-react";
+import { JSONContent } from "@tiptap/react";
+import { NotificationsDropdown } from "@/components/NotificationsDropdown";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { MoreVertical } from 'lucide-react';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
+import { Tables } from "@/integrations/supabase/types";
 
-interface Document {
-  id: string;
-  title: string;
-  owner_id: string;
-  created_at: string;
-  updated_at: string;
-  is_starred: boolean;
-  is_deleted: boolean;
-}
+type Document = Tables<"documents">;
 
-type TabValue = 'all' | 'starred' | 'trash';
+type TabValue = "all" | "starred" | "trash";
 
 export default function Dashboard() {
   const { user, profile } = useAuth();
@@ -42,87 +57,118 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [creating, setCreating] = useState(false);
-  const [tab, setTab] = useState<TabValue>('all');
+  const [tab, setTab] = useState<TabValue>("all");
   const [showTemplates, setShowTemplates] = useState(false);
 
-  useEffect(() => { if (user) fetchDocuments(); }, [user]);
+  useEffect(() => {
+    if (user) fetchDocuments();
+  }, [user]);
 
+  /**
+   * Fetches all documents from Supabase, including those in trash.
+   */
   const fetchDocuments = async () => {
     // Fetch all docs including deleted ones (for trash tab)
     const { data, error } = await supabase
-      .from('documents')
-      .select('id, title, owner_id, created_at, updated_at, is_starred, is_deleted')
-      .order('updated_at', { ascending: false });
+      .from("documents")
+      .select("id, title, owner_id, created_at, updated_at, is_starred, is_deleted")
+      .order("updated_at", { ascending: false });
 
     if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
       setDocuments(data || []);
     }
     setLoading(false);
   };
 
-  const createDocument = async (content?: any) => {
+  /**
+   * Creates a new document with an optional initial content.
+   */
+  const createDocument = async (content?: JSONContent) => {
     if (!user) return;
     setCreating(true);
     const { data, error } = await supabase
-      .from('documents')
+      .from("documents")
       .insert({
-        title: 'Untitled Document',
+        title: "Untitled Document",
         owner_id: user.id,
-        content: content || { type: 'doc', content: [{ type: 'paragraph' }] },
+        content: content || { type: "doc", content: [{ type: "paragraph" }] },
       })
-      .select('id')
+      .select("id")
       .single();
 
     if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     } else if (data) {
       navigate(`/doc/${data.id}`);
     }
     setCreating(false);
   };
 
+  /**
+   * Moves a document to the trash.
+   */
   const deleteDocument = async (id: string) => {
-    const { error } = await supabase.from('documents').update({ is_deleted: true }).eq('id', id);
+    const { error } = await supabase.from("documents").update({ is_deleted: true }).eq("id", id);
     if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
-      setDocuments(prev => prev.map(d => d.id === id ? { ...d, is_deleted: true } : d));
-      toast({ title: 'Moved to trash' });
+      setDocuments((prev) => prev.map((d) => (d.id === id ? { ...d, is_deleted: true } : d)));
+      toast({ title: "Moved to trash" });
     }
   };
 
   const restoreDocument = async (id: string) => {
-    const { error } = await supabase.from('documents').update({ is_deleted: false }).eq('id', id);
+    const { error } = await supabase.from("documents").update({ is_deleted: false }).eq("id", id);
     if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
-      setDocuments(prev => prev.map(d => d.id === id ? { ...d, is_deleted: false } : d));
-      toast({ title: 'Document restored' });
+      setDocuments((prev) => prev.map((d) => (d.id === id ? { ...d, is_deleted: false } : d)));
+      toast({ title: "Document restored" });
+    }
+  };
+
+  /**
+   * Permanently deletes a document from the database.
+   */
+  const permanentlyDeleteDocument = async (id: string) => {
+    const { error } = await supabase.from("documents").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      setDocuments((prev) => prev.filter((d) => d.id !== id));
+      toast({ title: "Document permanently deleted" });
     }
   };
 
   const toggleStar = async (id: string, starred: boolean) => {
-    const { error } = await supabase.from('documents').update({ is_starred: !starred }).eq('id', id);
+    const { error } = await supabase
+      .from("documents")
+      .update({ is_starred: !starred })
+      .eq("id", id);
     if (!error) {
-      setDocuments(prev => prev.map(d => d.id === id ? { ...d, is_starred: !starred } : d));
+      setDocuments((prev) => prev.map((d) => (d.id === id ? { ...d, is_starred: !starred } : d)));
     }
   };
 
   const duplicateDocument = async (doc: Document) => {
     if (!user) return;
     // Fetch full content
-    const { data: full } = await supabase.from('documents').select('content').eq('id', doc.id).single();
+    const { data: full } = await supabase
+      .from("documents")
+      .select("content")
+      .eq("id", doc.id)
+      .single();
     const { data, error } = await supabase
-      .from('documents')
+      .from("documents")
       .insert({ title: `${doc.title} (Copy)`, owner_id: user.id, content: full?.content || {} })
-      .select('id')
+      .select("id")
       .single();
     if (!error && data) {
-      toast({ title: 'Document duplicated' });
+      toast({ title: "Document duplicated" });
       fetchDocuments();
     }
   };
@@ -138,28 +184,30 @@ export default function Dashboard() {
     }
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     searchTimeoutRef.current = setTimeout(async () => {
-      const { data } = await supabase.rpc('search_documents', {
+      const { data } = await supabase.rpc("search_documents", {
         search_query: search.trim(),
         uid: user.id,
       });
       if (data) setSearchResults(data as Document[]);
     }, 300);
-    return () => { if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current); };
+    return () => {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
   }, [search, user]);
 
   const getFilteredDocs = () => {
     if (searchResults !== null) return searchResults;
     let filtered = documents;
-    if (tab === 'all') filtered = filtered.filter(d => !d.is_deleted);
-    else if (tab === 'starred') filtered = filtered.filter(d => d.is_starred && !d.is_deleted);
-    else if (tab === 'trash') filtered = filtered.filter(d => d.is_deleted);
+    if (tab === "all") filtered = filtered.filter((d) => !d.is_deleted);
+    else if (tab === "starred") filtered = filtered.filter((d) => d.is_starred && !d.is_deleted);
+    else if (tab === "trash") filtered = filtered.filter((d) => d.is_deleted);
     return filtered;
   };
 
   const filtered = getFilteredDocs();
 
   const formatDate = (date: string) =>
-    new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   return (
     <div className="min-h-screen bg-background">
@@ -190,7 +238,8 @@ export default function Dashboard() {
           <div>
             <h2 className="text-2xl font-bold">My Documents</h2>
             <p className="text-sm text-muted-foreground">
-              {documents.filter(d => !d.is_deleted).length} document{documents.filter(d => !d.is_deleted).length !== 1 ? 's' : ''}
+              {documents.filter((d) => !d.is_deleted).length} document
+              {documents.filter((d) => !d.is_deleted).length !== 1 ? "s" : ""}
             </p>
           </div>
           <div className="flex gap-2">
@@ -198,7 +247,11 @@ export default function Dashboard() {
               <LayoutTemplate className="mr-2 h-4 w-4" /> Templates
             </Button>
             <Button onClick={() => createDocument()} disabled={creating}>
-              {creating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+              {creating ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="mr-2 h-4 w-4" />
+              )}
               New Document
             </Button>
           </div>
@@ -220,7 +273,12 @@ export default function Dashboard() {
         {/* Search */}
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input className="pl-10" placeholder="Search documents..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input
+            className="pl-10"
+            placeholder="Search documents..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
 
         {/* Document Grid */}
@@ -232,12 +290,22 @@ export default function Dashboard() {
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <FileText className="mb-4 h-16 w-16 text-muted-foreground/30" />
             <h3 className="mb-2 text-lg font-medium">
-              {tab === 'trash' ? 'Trash is empty' : search ? 'No documents found' : tab === 'starred' ? 'No starred documents' : 'No documents yet'}
+              {tab === "trash"
+                ? "Trash is empty"
+                : search
+                  ? "No documents found"
+                  : tab === "starred"
+                    ? "No starred documents"
+                    : "No documents yet"}
             </h3>
             <p className="mb-6 text-sm text-muted-foreground">
-              {tab === 'trash' ? 'Deleted documents appear here' : search ? 'Try a different search term' : 'Create your first document to get started'}
+              {tab === "trash"
+                ? "Deleted documents appear here"
+                : search
+                  ? "Try a different search term"
+                  : "Create your first document to get started"}
             </p>
-            {tab === 'all' && !search && (
+            {tab === "all" && !search && (
               <Button onClick={() => createDocument()} disabled={creating}>
                 <Plus className="mr-2 h-4 w-4" /> New Document
               </Button>
@@ -246,8 +314,15 @@ export default function Dashboard() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((doc) => (
-              <Card key={doc.id} className="group relative transition-all hover:shadow-md hover:border-primary/20 animate-fade-in">
-                <Link to={tab === 'trash' ? '#' : `/doc/${doc.id}`} className="block" onClick={tab === 'trash' ? (e) => e.preventDefault() : undefined}>
+              <Card
+                key={doc.id}
+                className="group relative transition-all hover:shadow-md hover:border-primary/20 animate-fade-in"
+              >
+                <Link
+                  to={tab === "trash" ? "#" : `/doc/${doc.id}`}
+                  className="block"
+                  onClick={tab === "trash" ? (e) => e.preventDefault() : undefined}
+                >
                   <CardContent className="p-5">
                     <div className="mb-3 flex items-start justify-between">
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
@@ -258,7 +333,9 @@ export default function Dashboard() {
                           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         )}
                         {doc.owner_id === user?.id && (
-                          <Badge variant="secondary" className="text-xs">Owner</Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            Owner
+                          </Badge>
                         )}
                       </div>
                     </div>
@@ -273,29 +350,77 @@ export default function Dashboard() {
 
                 {/* Context menu */}
                 <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
-                  {tab === 'trash' ? (
+                  {tab === "trash" ? (
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => restoreDocument(doc.id)} title="Restore">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => restoreDocument(doc.id)}
+                        title="Restore"
+                      >
                         <RotateCcw className="h-4 w-4" />
                       </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive"
+                            title="Delete Permanently"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the
+                              document "{doc.title}".
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => permanentlyDeleteDocument(doc.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete Permanently
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   ) : (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.preventDefault()}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={(e) => e.preventDefault()}
+                        >
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => toggleStar(doc.id, doc.is_starred)}>
-                          {doc.is_starred ? <StarOff className="mr-2 h-4 w-4" /> : <Star className="mr-2 h-4 w-4" />}
-                          {doc.is_starred ? 'Unstar' : 'Star'}
+                          {doc.is_starred ? (
+                            <StarOff className="mr-2 h-4 w-4" />
+                          ) : (
+                            <Star className="mr-2 h-4 w-4" />
+                          )}
+                          {doc.is_starred ? "Unstar" : "Star"}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => duplicateDocument(doc)}>
                           <Copy className="mr-2 h-4 w-4" /> Duplicate
                         </DropdownMenuItem>
                         {doc.owner_id === user?.id && (
-                          <DropdownMenuItem className="text-destructive" onClick={() => deleteDocument(doc.id)}>
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => deleteDocument(doc.id)}
+                          >
                             <Trash2 className="mr-2 h-4 w-4" /> Delete
                           </DropdownMenuItem>
                         )}
@@ -310,7 +435,11 @@ export default function Dashboard() {
       </main>
 
       {/* Template Gallery */}
-      <TemplateGallery open={showTemplates} onOpenChange={setShowTemplates} onSelect={(content) => createDocument(content)} />
+      <TemplateGallery
+        open={showTemplates}
+        onOpenChange={setShowTemplates}
+        onSelect={(content) => createDocument(content)}
+      />
     </div>
   );
 }

@@ -1,8 +1,8 @@
-import { useState, useCallback } from 'react';
-import type { Editor } from '@tiptap/react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { X, ChevronDown, ChevronUp, Replace } from 'lucide-react';
+import { useState, useCallback } from "react";
+import type { Editor } from "@tiptap/react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { X, ChevronDown, ChevronUp, Replace } from "lucide-react";
 
 interface FindReplaceProps {
   editor: Editor;
@@ -10,14 +10,17 @@ interface FindReplaceProps {
 }
 
 export function FindReplace({ editor, onClose }: FindReplaceProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [replaceTerm, setReplaceTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [replaceTerm, setReplaceTerm] = useState("");
   const [showReplace, setShowReplace] = useState(false);
   const [matchCount, setMatchCount] = useState(0);
   const [currentMatch, setCurrentMatch] = useState(0);
 
   const findMatches = useCallback(() => {
-    if (!searchTerm) { setMatchCount(0); return []; }
+    if (!searchTerm) {
+      setMatchCount(0);
+      return [];
+    }
     const text = editor.state.doc.textContent;
     const matches: number[] = [];
     let idx = text.toLowerCase().indexOf(searchTerm.toLowerCase());
@@ -46,7 +49,7 @@ export function FindReplace({ editor, onClose }: FindReplaceProps) {
 
     doc.descendants((node, nodePos) => {
       if (!node.isText) return;
-      const text = node.text || '';
+      const text = node.text || "";
       let searchIdx = text.toLowerCase().indexOf(searchTerm.toLowerCase());
       while (searchIdx !== -1) {
         if (matchIndex === index) {
@@ -86,7 +89,7 @@ export function FindReplace({ editor, onClose }: FindReplaceProps) {
   const handleReplaceAll = () => {
     if (!searchTerm) return;
     const doc = editor.state.doc;
-    let text = '';
+    let text = "";
     doc.descendants((node) => {
       if (node.isText) text += node.text;
     });
@@ -94,7 +97,7 @@ export function FindReplace({ editor, onClose }: FindReplaceProps) {
     const positions: { from: number; to: number }[] = [];
     doc.descendants((node, pos) => {
       if (!node.isText) return;
-      const nodeText = node.text || '';
+      const nodeText = node.text || "";
       let idx = nodeText.toLowerCase().indexOf(searchTerm.toLowerCase());
       while (idx !== -1) {
         positions.push({ from: pos + idx, to: pos + idx + searchTerm.length });
@@ -116,21 +119,42 @@ export function FindReplace({ editor, onClose }: FindReplaceProps) {
         <Input
           placeholder="Find..."
           value={searchTerm}
-          onChange={(e) => { setSearchTerm(e.target.value); }}
-          onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSearch();
+          }}
           className="h-8 text-sm"
           autoFocus
         />
         <span className="text-xs text-muted-foreground whitespace-nowrap">
-          {matchCount > 0 ? `${currentMatch + 1}/${matchCount}` : '0/0'}
+          {matchCount > 0 ? `${currentMatch + 1}/${matchCount}` : "0/0"}
         </span>
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handlePrev} disabled={matchCount === 0}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          onClick={handlePrev}
+          disabled={matchCount === 0}
+        >
           <ChevronUp className="h-3 w-3" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleNext} disabled={matchCount === 0}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          onClick={handleNext}
+          disabled={matchCount === 0}
+        >
           <ChevronDown className="h-3 w-3" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowReplace(!showReplace)}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          onClick={() => setShowReplace(!showReplace)}
+        >
           <Replace className="h-3 w-3" />
         </Button>
         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>

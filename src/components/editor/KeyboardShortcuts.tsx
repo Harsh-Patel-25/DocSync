@@ -1,6 +1,4 @@
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface KeyboardShortcutsProps {
   open: boolean;
@@ -8,30 +6,39 @@ interface KeyboardShortcutsProps {
 }
 
 const shortcuts = [
-  { category: 'Text Formatting', items: [
-    { keys: 'Ctrl+B', action: 'Bold' },
-    { keys: 'Ctrl+I', action: 'Italic' },
-    { keys: 'Ctrl+U', action: 'Underline' },
-    { keys: 'Ctrl+Shift+X', action: 'Strikethrough' },
-    { keys: 'Ctrl+Shift+H', action: 'Highlight' },
-    { keys: 'Ctrl+E', action: 'Code' },
-  ]},
-  { category: 'Paragraphs', items: [
-    { keys: 'Ctrl+Alt+1', action: 'Heading 1' },
-    { keys: 'Ctrl+Alt+2', action: 'Heading 2' },
-    { keys: 'Ctrl+Alt+3', action: 'Heading 3' },
-    { keys: 'Ctrl+Shift+8', action: 'Bullet List' },
-    { keys: 'Ctrl+Shift+9', action: 'Ordered List' },
-    { keys: 'Ctrl+Shift+B', action: 'Blockquote' },
-  ]},
-  { category: 'General', items: [
-    { keys: 'Ctrl+Z', action: 'Undo' },
-    { keys: 'Ctrl+Shift+Z', action: 'Redo' },
-    { keys: 'Ctrl+H', action: 'Find & Replace' },
-    { keys: 'Ctrl+/', action: 'Keyboard Shortcuts' },
-    { keys: 'Ctrl+Shift+F', action: 'Focus Mode' },
-    { keys: 'Ctrl+P', action: 'Print' },
-  ]},
+  {
+    category: "Text Formatting",
+    items: [
+      { keys: "Ctrl+B", action: "Bold" },
+      { keys: "Ctrl+I", action: "Italic" },
+      { keys: "Ctrl+U", action: "Underline" },
+      { keys: "Ctrl+Shift+X", action: "Strikethrough" },
+      { keys: "Ctrl+Shift+H", action: "Highlight" },
+      { keys: "Ctrl+E", action: "Code" },
+    ],
+  },
+  {
+    category: "Paragraphs",
+    items: [
+      { keys: "Ctrl+Alt+1", action: "Heading 1" },
+      { keys: "Ctrl+Alt+2", action: "Heading 2" },
+      { keys: "Ctrl+Alt+3", action: "Heading 3" },
+      { keys: "Ctrl+Shift+8", action: "Bullet List" },
+      { keys: "Ctrl+Shift+9", action: "Ordered List" },
+      { keys: "Ctrl+Shift+B", action: "Blockquote" },
+    ],
+  },
+  {
+    category: "General",
+    items: [
+      { keys: "Ctrl+Z", action: "Undo" },
+      { keys: "Ctrl+Shift+Z", action: "Redo" },
+      { keys: "Ctrl+H", action: "Find & Replace" },
+      { keys: "Ctrl+/", action: "Keyboard Shortcuts" },
+      { keys: "Ctrl+Shift+F", action: "Focus Mode" },
+      { keys: "Ctrl+P", action: "Print" },
+    ],
+  },
 ];
 
 export function KeyboardShortcuts({ open, onOpenChange }: KeyboardShortcutsProps) {

@@ -1,0 +1,19 @@
+1. Real-Time Collaboration & Presence (High Priority)
+True Conflict Resolution (Yjs): Currently, the system broadcasts the whole document, which can cause data loss. A proper Yjs implementation is needed to sync only the "deltas" (changes).
+Live Cursors: Visible caret positions for other users as they type.
+Username Labels: Displaying the user's name above their cursor.
+User Colors: Assigning unique colors to different editors' cursors.
+2. Version History & Search
+Diff View: A visual comparison showing what was added or deleted between two document versions.
+Deep Content Search: The ability to search for text inside a document, not just in the titles.
+3. Authentication & Notifications
+Password Reset Flow: A "Forgot Password" link and the UI to handle the reset email and new password entry.
+Email Notifications: Sending alerts via email when a user is mentioned or a document is shared.
+User Mentions (@): The ability to tag a user in a comment using the @ symbol.
+5. Performance & DevOps
+Scalability Optimization: The sync logic must be updated to support the target of 50 concurrent users without lag.
+Docker Integration: Dockerfile and docker-compose.yml for containerized environments.
+CI/CD Pipeline: Automation for testing and deployment (e.g., GitHub Actions).
+System Monitoring: A health/status endpoint for tracking backend performance.
+6. Security (Production Level)
+Advanced Middleware: Implementation of Helmet, Rate Limiting, and explicit CSRF protection (which are standard for production but currently missing in the local config).

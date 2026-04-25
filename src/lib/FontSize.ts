@@ -1,6 +1,6 @@
-import { Extension } from '@tiptap/core';
+import { Extension } from "@tiptap/core";
 
-declare module '@tiptap/core' {
+declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     fontSize: {
       setFontSize: (size: string) => ReturnType;
@@ -10,12 +10,12 @@ declare module '@tiptap/core' {
 }
 
 export const FontSize = Extension.create({
-  name: 'fontSize',
+  name: "fontSize",
 
   addGlobalAttributes() {
     return [
       {
-        types: ['textStyle'],
+        types: ["textStyle"],
         attributes: {
           fontSize: {
             default: null,

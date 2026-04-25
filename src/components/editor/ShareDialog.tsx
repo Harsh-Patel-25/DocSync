@@ -1,19 +1,22 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
-import { UserPlus, Trash2, Share2 } from 'lucide-react';
-import type { Database } from '@/integrations/supabase/types';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { UserPlus, Trash2, Share2 } from "lucide-react";
+import { sendEmailNotification } from "@/lib/emailService";
+import type { Database } from "@/integrations/supabase/types";
 
-type DocumentRole = Database['public']['Enums']['document_role'];
+type DocumentRole = Database["public"]["Enums"]["document_role"];
 
 interface Permission {
   id: string;
@@ -35,8 +38,8 @@ export function ShareDialog({
 }) {
   const { toast } = useToast();
   const [permissions, setPermissions] = useState<Permission[]>([]);
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState<DocumentRole>('viewer');
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState<DocumentRole>("viewer");
   const [adding, setAdding] = useState(false);
 
   useEffect(() => {
@@ -45,19 +48,19 @@ export function ShareDialog({
 
   const fetchPermissions = async () => {
     const { data } = await supabase
-      .from('document_permissions')
-      .select('*')
-      .eq('document_id', documentId);
+      .from("document_permissions")
+      .select("*")
+      .eq("document_id", documentId);
 
     if (data) {
-      const userIds = data.map(p => p.user_id);
+      const userIds = data.map((p) => p.user_id);
       const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, display_name, email')
-        .in('user_id', userIds);
+        .from("profiles")
+        .select("user_id, display_name, email")
+        .in("user_id", userIds);
 
-      const emailMap = new Map(profiles?.map(p => [p.user_id, p.email || p.display_name]) || []);
-      setPermissions(data.map(p => ({ ...p, email: emailMap.get(p.user_id) || p.user_id })));
+      const emailMap = new Map(profiles?.map((p) => [p.user_id, p.email || p.display_name]) || []);
+      setPermissions(data.map((p) => ({ ...p, email: emailMap.get(p.user_id) || p.user_id })));
     }
   };
 
@@ -67,43 +70,59 @@ export function ShareDialog({
 
     // Find user by email
     const { data: profiles } = await supabase
-      .from('profiles')
-      .select('user_id')
-      .eq('email', email.trim());
+      .from("profiles")
+      .select("user_id")
+      .eq("email", email.trim());
 
     if (!profiles || profiles.length === 0) {
-      toast({ title: 'User not found', description: 'No user with that email exists.', variant: 'destructive' });
+      toast({
+        title: "User not found",
+        description: "No user with that email exists.",
+        variant: "destructive",
+      });
       setAdding(false);
       return;
     }
 
     const userId = profiles[0].user_id;
 
-    const { error } = await supabase
-      .from('document_permissions')
-      .upsert({
+    const { error } = await supabase.from("document_permissions").upsert(
+      {
         document_id: documentId,
         user_id: userId,
         role,
-      }, { onConflict: 'document_id,user_id' });
+      },
+      { onConflict: "document_id,user_id" }
+    );
 
     if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: 'Permission added' });
-      setEmail('');
+      // Create notification for the user who was granted access
+      await supabase.from("notifications").insert({
+        user_id: userId,
+        type: "access_granted",
+        message: `You've been given ${role} access to a document`,
+        document_id: documentId,
+      });
+
+      // Send email for share
+      sendEmailNotification(userId, "share", documentId);
+
+      toast({ title: "Permission added" });
+      setEmail("");
       fetchPermissions();
     }
     setAdding(false);
   };
 
   const removePermission = async (permId: string) => {
-    await supabase.from('document_permissions').delete().eq('id', permId);
+    await supabase.from("document_permissions").delete().eq("id", permId);
     fetchPermissions();
   };
 
   const updateRole = async (permId: string, newRole: DocumentRole) => {
-    await supabase.from('document_permissions').update({ role: newRole }).eq('id', permId);
+    await supabase.from("document_permissions").update({ role: newRole }).eq("id", permId);
     fetchPermissions();
   };
 
@@ -145,13 +164,19 @@ export function ShareDialog({
 
         <div className="mt-4 space-y-2">
           <Label>People with access</Label>
-          {permissions.map(perm => (
-            <div key={perm.id} className="flex items-center justify-between rounded-lg border p-3 text-sm">
+          {permissions.map((perm) => (
+            <div
+              key={perm.id}
+              className="flex items-center justify-between rounded-lg border p-3 text-sm"
+            >
               <span className="truncate">{perm.email}</span>
               <div className="flex items-center gap-2">
-                {isOwner && perm.role !== 'owner' ? (
+                {isOwner && perm.role !== "owner" ? (
                   <>
-                    <Select value={perm.role} onValueChange={(v: DocumentRole) => updateRole(perm.id, v)}>
+                    <Select
+                      value={perm.role}
+                      onValueChange={(v: DocumentRole) => updateRole(perm.id, v)}
+                    >
                       <SelectTrigger className="h-8 w-24 text-xs">
                         <SelectValue />
                       </SelectTrigger>

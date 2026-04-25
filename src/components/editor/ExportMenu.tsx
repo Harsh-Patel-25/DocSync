@@ -1,9 +1,12 @@
-import type { Editor } from '@tiptap/react';
+import type { Editor } from "@tiptap/react";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Download, FileText, Code, Printer } from 'lucide-react';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Download, FileText, Code, Printer } from "lucide-react";
 
 interface ExportMenuProps {
   editor: Editor;
@@ -11,11 +14,11 @@ interface ExportMenuProps {
 }
 
 export function ExportMenu({ editor, title }: ExportMenuProps) {
-  const sanitizedTitle = title.replace(/[^a-zA-Z0-9-_ ]/g, '').trim() || 'document';
+  const sanitizedTitle = title.replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "document";
 
   const exportTxt = () => {
     const text = editor.state.doc.textContent;
-    download(`${sanitizedTitle}.txt`, text, 'text/plain');
+    download(`${sanitizedTitle}.txt`, text, "text/plain");
   };
 
   const exportHtml = () => {
@@ -29,17 +32,17 @@ code{background:#f4f4f4;padding:2px 6px;border-radius:3px;font-size:0.9em}
 pre{background:#f4f4f4;padding:16px;border-radius:8px;overflow-x:auto}
 a{color:#2563eb}</style></head>
 <body>${editor.getHTML()}</body></html>`;
-    download(`${sanitizedTitle}.html`, html, 'text/html');
+    download(`${sanitizedTitle}.html`, html, "text/html");
   };
 
   const exportJson = () => {
     const json = JSON.stringify(editor.getJSON(), null, 2);
-    download(`${sanitizedTitle}.json`, json, 'application/json');
+    download(`${sanitizedTitle}.json`, json, "application/json");
   };
 
   const handlePrint = () => {
     const html = editor.getHTML();
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     if (!printWindow) return;
     printWindow.document.write(`<!DOCTYPE html><html><head><title>${title}</title>
 <style>body{font-family:system-ui;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7}
@@ -55,7 +58,7 @@ code{background:#f4f4f4;padding:2px 6px;border-radius:3px}
   const download = (filename: string, content: string, type: string) => {
     const blob = new Blob([content], { type });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = filename;
     a.click();

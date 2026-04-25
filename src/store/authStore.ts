@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { supabase } from '@/integrations/supabase/client';
-import type { User } from '@supabase/supabase-js';
+import { create } from "zustand";
+import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 interface Profile {
   id: string;
@@ -28,11 +28,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   setProfile: (profile) => set({ profile }),
   setLoading: (loading) => set({ loading }),
   fetchProfile: async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
+    const { data } = await supabase.from("profiles").select("*").eq("user_id", userId).single();
     if (data) set({ profile: data });
   },
   signOut: async () => {

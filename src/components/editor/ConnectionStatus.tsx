@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useDocumentStore } from '@/store/documentStore';
-import { WifiOff } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useDocumentStore } from "@/store/documentStore";
+import { WifiOff } from "lucide-react";
 
 export function ConnectionStatus() {
   const { isOnline, setOnline } = useDocumentStore();
@@ -8,16 +8,22 @@ export function ConnectionStatus() {
 
   useEffect(() => {
     setOnline(navigator.onLine);
-    
-    const handleOnline = () => { setOnline(true); setShow(false); };
-    const handleOffline = () => { setOnline(false); setShow(true); };
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    const handleOnline = () => {
+      setOnline(true);
+      setShow(false);
+    };
+    const handleOffline = () => {
+      setOnline(false);
+      setShow(true);
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
     };
   }, [setOnline]);
 
@@ -32,13 +38,15 @@ export function ConnectionStatus() {
   if (!show) return null;
 
   return (
-    <div className={`flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium ${
-      isOnline 
-        ? 'bg-success text-success-foreground' 
-        : 'bg-destructive text-destructive-foreground animate-pulse-soft'
-    }`}>
+    <div
+      className={`flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium ${
+        isOnline
+          ? "bg-success text-success-foreground"
+          : "bg-destructive text-destructive-foreground animate-pulse-soft"
+      }`}
+    >
       {isOnline ? (
-        'Connection restored'
+        "Connection restored"
       ) : (
         <>
           <WifiOff className="h-4 w-4" />

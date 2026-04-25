@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { History, RotateCcw } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { History, RotateCcw } from "lucide-react";
 
 interface Version {
   id: string;
@@ -27,21 +27,21 @@ export function VersionHistory({
 
   const fetchVersions = async () => {
     const { data } = await supabase
-      .from('document_versions')
-      .select('*')
-      .eq('document_id', documentId)
-      .order('created_at', { ascending: false })
+      .from("document_versions")
+      .select("*")
+      .eq("document_id", documentId)
+      .order("created_at", { ascending: false })
       .limit(50);
 
     if (data) setVersions(data);
   };
 
   const formatTime = (date: string) =>
-    new Date(date).toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    new Date(date).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
 
   return (

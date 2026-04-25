@@ -1,6 +1,6 @@
-import { useDocumentStore } from '@/store/documentStore';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useDocumentStore } from "@/store/documentStore";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function PresenceBar() {
   const { activeUsers } = useDocumentStore();
